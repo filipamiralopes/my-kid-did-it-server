@@ -18,6 +18,9 @@ app.use("/api/drawings", drawingRoutes);
 // Orders
 const orderRoutes = require("./routes/orders.routes");
 app.use("/api/orders", orderRoutes);
+// Users
+const userRoutes = require("./routes/users.routes");
+app.use("/api/users", userRoutes);
 
 // ERROR HANDLING
 const {

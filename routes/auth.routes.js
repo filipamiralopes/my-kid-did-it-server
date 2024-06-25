@@ -101,4 +101,5 @@ router.get("/verify", isAuthenticated, (req, res) => {
     res.status(401).json({ message: "Invalid headers" });
   }
 });
+
 module.exports = router;
