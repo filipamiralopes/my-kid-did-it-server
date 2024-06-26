@@ -3,8 +3,9 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User.model");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../middleware/jwt.middleware");
+const uploader = require("../middleware/cloudinary.config.js");
 
-router.post("/signup", async (req, res, next) => {
+router.post("/signup", uploader.single("imageUrl"), async (req, res, next) => {
 
   // // Use regex to validate the email format
   // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -25,6 +26,13 @@ router.post("/signup", async (req, res, next) => {
   //   return;
   // }
 
+  let userImage;
+  if (!req.file) {
+    console.log("No image was selected");
+  } else {
+    userImage = req.file.path;
+  }
+
   try {
     const foundUser = await User.findOne({
       $or: [{ username: req.body.username }, { email: req.body.email }],
@@ -34,6 +42,7 @@ router.post("/signup", async (req, res, next) => {
         errorMessage: "Please pick unique username and email",
       });
     } else {
+
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync(req.body.password, salt);
 
@@ -41,10 +50,9 @@ router.post("/signup", async (req, res, next) => {
         username: req.body.username,
         email: req.body.email,
         password: hashedPassword,
+        userImage: userImage,
       };
-      const createdUser = await User.create(
-        userToCreate
-      );
+      const createdUser = await User.create(userToCreate);
 
       console.log("User created", createdUser);
       res.status(201).json(createdUser); 
@@ -69,11 +77,10 @@ router.post("/login", async (req, res, next) => {
           username: foundUser.username,
         };
 
-        const authToken = jwt.sign(
-          loggedInUser, 
-          process.env.TOKEN_SECRET,
-          { algorithm: "HS256", expiresIn: "6h" }
-        );
+        const authToken = jwt.sign(loggedInUser, process.env.TOKEN_SECRET, {
+          algorithm: "HS256",
+          expiresIn: "6h",
+        });
 
         res.status(200).json({ message: "Login successful", authToken }); // do not send user to FE, not secure
       } else {
@@ -88,7 +95,7 @@ router.post("/login", async (req, res, next) => {
     }
   } catch (error) {
     console.log(error);
-    next(error)
+    next(error);
   }
 });
 
