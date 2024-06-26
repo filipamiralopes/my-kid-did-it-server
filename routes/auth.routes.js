@@ -109,4 +109,19 @@ router.get("/verify", isAuthenticated, (req, res) => {
   }
 });
 
+router.get('/profile/:userId', async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.params.userId)
+    res.status(200).json({
+      username: currentUser.username,
+      email: currentUser.email,
+      userImage: currentUser.userImage,
+      drawings: currentUser.drawings,
+      orders: currentUser.orders
+    })
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 module.exports = router;
