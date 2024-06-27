@@ -23,6 +23,6 @@ const drawingSchema = new Schema(
   }
 );
 
-const User = model("Drawing", drawingSchema);
+const Drawing = model("Drawing", drawingSchema);
 
 module.exports = Drawing;
