@@ -1,14 +1,7 @@
 const router = require("express").Router();
 const Drawing = require("../models/Drawing.model");
 const User = require("../models/User.model");
-const cloudinary = require("cloudinary").v2;
-
-async function uploadDrawing(file) {
-  const res = await cloudinary.uploader.upload(file, {
-    resource_type: "auto",
-  });
-  return res;
-}
+const {uploadDrawing} = require("../middleware/apiUtils");
 
 router.post("/upload", async (req, res, next) => {
   try {
@@ -24,12 +17,11 @@ router.post("/upload", async (req, res, next) => {
       title: req.body.title,
       file: result.secure_url,
       author: req.body.author,
-      // orders?
     };
     const createdDrawing = await Drawing.create(drawingToCreate);
     await createdDrawing.save();
 
-    // save drawings to respective user in the DB
+    // save drawing to respective user in the DB
     await User.findByIdAndUpdate(
       req.body.author,
       { $push: { drawings: createdDrawing._id } },
