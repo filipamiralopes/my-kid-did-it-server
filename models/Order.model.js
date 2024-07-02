@@ -22,6 +22,10 @@ const orderSchema = new Schema(
     },
     mergedImg: {
         type: String, // cloudinary path
+    },
+    fulfilled: {
+      type: Boolean,
+      default: false
     }
   },
   {
