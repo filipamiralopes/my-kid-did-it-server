@@ -65,7 +65,7 @@ router.put("/", async (req, res, next) => {
       case "mug":
         productImg =
           "https://res.cloudinary.com/dzymhjyvm/image/upload/v1719829589/mug_qymqid.png";
-        resizedDrawingMeta = { height: 170, x: 190, y: 270 };
+        resizedDrawingMeta = { height: 170, x: 240, y: 200 };
         break;
       case "toe_bag":
         productImg =
