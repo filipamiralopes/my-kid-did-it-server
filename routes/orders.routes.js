@@ -147,4 +147,16 @@ router.put("/address", async (req, res, next) => {
   }
 });
 
+// Get all orders of given user
+router.get("/user/:id", async (req, res, next) => {
+  try {
+    const foudUser = await User.findById(req.params.id).populate("orders");
+    const fulfilledOrders = foudUser.orders.filter(order => order.fulfilled === true)
+    res.status(200).json(fulfilledOrders);
+  } catch (error) {
+    console.error("Error while retrieving user's drawings ->", error);
+    next(error);
+  }
+});
+
 module.exports = router;
