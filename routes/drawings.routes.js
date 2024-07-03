@@ -79,4 +79,14 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
+router.get("/:id", async (req, res, next) => {
+  try {
+    const drawing = await Drawing.findById(req.params.id);
+    res.status(200).json(drawing);
+  } catch (error) {
+    console.error("Error while retrieving drawing ->", error);
+    next(error);
+  }
+});
+
 module.exports = router;
