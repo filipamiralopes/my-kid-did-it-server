@@ -85,16 +85,17 @@ router.post("/login", async (req, res, next) => {
         res.status(200).json({ message: "Login successful", authToken }); // do not send user to FE, not secure
       } else {
         res.status(500).json({
-          errorMessage: "Invalid password",
+          errorMessage: "Invalid credentials",
         });
       }
     } else {
       res.status(500).json({
-        errorMessage: "Invalid email",
+        errorMessage: "Invalid credentials",
       });
     }
   } catch (error) {
     console.log(error);
+    res.status(500).json({ errorMessage: "An unexpected error occurred" });
     next(error);
   }
 });
@@ -116,8 +117,9 @@ router.get('/profile/:userId', async (req, res) => {
       username: currentUser.username,
       email: currentUser.email,
       userImage: currentUser.userImage,
-      drawings: currentUser.drawings,
-      orders: currentUser.orders
+      drawings: currentUser.drawings.length, // amount
+      orders: currentUser.orders.length, // amount
+      createdAt: currentUser.createdAt
     })
   } catch (error) {
     console.log(error)

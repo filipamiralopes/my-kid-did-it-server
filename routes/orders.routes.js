@@ -170,6 +170,11 @@ router.delete("/user/:id", async (req, res, next) => {
     await Order.deleteMany({
       _id: { $in: unFulfilledOrders.map((order) => order._id) },
     });
+    // delete also orders from user
+    await User.updateOne(
+      { _id: req.params.id },
+      { $pull: { orders: { $in: unFulfilledOrders } } }
+    );
     console.log(
       "These unfulfilled orders were deleted --> ",
       unFulfilledOrders.map((order) => order._id)
