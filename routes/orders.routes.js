@@ -44,10 +44,10 @@ router.post("/", async (req, res, next) => {
 router.put("/", async (req, res, next) => {
   const price = (product) => {
     const priceMap = {
-      tshirt: 19.50,
-      mug: 7.50,
-      toe_bag: 11.50,
-      beani: 11.30,
+      tshirt: 19.5,
+      mug: 7.5,
+      toe_bag: 11.5,
+      beani: 11.3,
     };
     return priceMap[product];
   };
@@ -151,10 +151,32 @@ router.put("/address", async (req, res, next) => {
 router.get("/user/:id", async (req, res, next) => {
   try {
     const foudUser = await User.findById(req.params.id).populate("orders");
-    const fulfilledOrders = foudUser.orders.filter(order => order.fulfilled === true)
+    const fulfilledOrders = foudUser.orders.filter(
+      (order) => order.fulfilled === true
+    );
     res.status(200).json(fulfilledOrders);
   } catch (error) {
     console.error("Error while retrieving user's drawings ->", error);
+    next(error);
+  }
+});
+
+router.delete("/user/:id", async (req, res, next) => {
+  try {
+    const foudUser = await User.findById(req.params.id).populate("orders");
+    const unFulfilledOrders = foudUser.orders.filter(
+      (order) => order.fulfilled === false
+    );
+    await Order.deleteMany({
+      _id: { $in: unFulfilledOrders.map((order) => order._id) },
+    });
+    console.log(
+      "These unfulfilled orders were deleted --> ",
+      unFulfilledOrders.map((order) => order._id)
+    );
+    res.status(200).json(unFulfilledOrders.map((order) => order._id));
+  } catch (error) {
+    console.error("Error while deleting user's unfulfilled orders ->", error);
     next(error);
   }
 });
