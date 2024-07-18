@@ -3,7 +3,7 @@ const Order = require("../models/Order.model");
 const Drawing = require("../models/Drawing.model");
 const User = require("../models/User.model");
 const mergeImages = require("merge-images");
-const { Canvas, Image } = require("canvas");
+const { Canvas, Image, createCanvas, loadImage } = require("canvas");
 const cloudinary = require("cloudinary").v2;
 const { uploadDrawing } = require("../middleware/apiUtils");
 
@@ -85,8 +85,9 @@ router.put("/", async (req, res, next) => {
 
     const resizedDrawing = cloudinary.url(originalFile, {
       transformation: [
-        { height: resizedDrawingMeta.height, crop: "fill" },
-        { fetch_format: "auto" },
+        // { height: resizedDrawingMeta.height, crop: "fill" },
+        { height: resizedDrawingMeta.height, width: resizedDrawingMeta.height },
+        { fetch_format: "png" },
       ],
     });
 

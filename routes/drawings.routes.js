@@ -3,8 +3,10 @@ const Drawing = require("../models/Drawing.model");
 const User = require("../models/User.model");
 const Order = require("../models/Order.model");
 const { uploadDrawing } = require("../middleware/apiUtils");
+const uploader = require("../middleware/cloudinary.config.js");
 
 
+// Upload canvas drawing
 router.post("/upload", async (req, res, next) => {
   try {
     if (!req.body.drawingData) {
@@ -18,6 +20,40 @@ router.post("/upload", async (req, res, next) => {
     const drawingToCreate = {
       title: req.body.title,
       file: result.secure_url,
+      author: req.body.author,
+    };
+    const createdDrawing = await Drawing.create(drawingToCreate);
+    await createdDrawing.save();
+
+    // save drawing to respective user in the DB
+    await User.findByIdAndUpdate(
+      req.body.author,
+      { $push: { drawings: createdDrawing._id } },
+      { new: true, useFindAndModify: false }
+    );
+
+    console.log("Drawing uploaded!", createdDrawing);
+    res.status(201).json(createdDrawing);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// Upload file from user
+router.post("/upload-file", uploader.single("fileUrl"), async (req, res, next) => {
+
+  let fileImage;
+  if (!req.file) {
+    console.log("No file was selected");
+  } else {
+    fileImage = req.file.path;
+  }
+
+  try {
+    const drawingToCreate = {
+      title: req.body.title, // TODO
+      file: fileImage,
       author: req.body.author,
     };
     const createdDrawing = await Drawing.create(drawingToCreate);
